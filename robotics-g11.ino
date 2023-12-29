@@ -102,7 +102,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  // if no data received, skip process
+  // if no data received from bluetooth, skip process
   if(!(Serial.available() > 0)) return;
 
   incomingByte = Serial.parseInt();
