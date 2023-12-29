@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-const int motorPinEnA=6 // connect motor driver EnA pin to arduino uno pin 6 (~ PWM)
+const int motorPinEnA=6; // connect motor driver EnA pin to arduino uno pin 6 (~ PWM)
 const int motorPinIn1=7; // connect motor driver in1 pin to arduino uno pin 7
 const int motorPinIn2=8; // connect motor driver in2 pin to arduino uno pin 8
 
@@ -53,7 +53,7 @@ void turnServo(int joystickDirection){
       servo.write(10); // turn servo motor to angle 10 degree
       break;
     case JOYSTICK_RIGHT:
-      servo.write(160) // turn servo motor to angle 160 degree
+      servo.write(160); // turn servo motor to angle 160 degree
       break;
   }
 }
@@ -61,18 +61,18 @@ void turnServo(int joystickDirection){
 void runMotor(int joystickDirection) {
   switch(joystickDirection) {
     case BUTTON_A_FORWARD:
-        turnOnLeftMotor(false);
-        turnOnRightMotor(false);
+        turnOnLeftMotor(false); // run motor forward
+        turnOnRightMotor(false); // run motor forward
       break;
 
     case BUTTON_B_BACKWARD:
-        turnOnLeftMotor(true);
-        turnOnRightMotor(true);
+        turnOnLeftMotor(true); // run motor direction
+        turnOnRightMotor(true); // run motor direction
       break;
 
     default:
         turnOffLeftMotor();
-        turnOffRIghtMotor();
+        turnOffRightMotor();
       break;
   }
 }
