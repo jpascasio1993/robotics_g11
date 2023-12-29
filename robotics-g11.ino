@@ -25,6 +25,8 @@ const int STOP=52;
 
 int incomingByte; // data received from mobile app transmitted through bluetooth
 
+int servoDegree=0;
+
 Servo servo;
 
 void turnOffLeftMotor() {
@@ -50,10 +52,12 @@ void turnOnRightMotor(bool isReverse) {
 void turnServo(int joystickDirection){
   switch(joystickDirection) {
     case JOYSTICK_LEFT:
-      servo.write(10); // turn servo motor to angle 10 degree
+      servoDegree = 10;
+      servo.write(servoDegree); // turn servo motor to angle 10 degree
       break;
     case JOYSTICK_RIGHT:
-      servo.write(160); // turn servo motor to angle 160 degree
+      servoDegree=160;
+      servo.write(servoDegree); // turn servo motor to angle 160 degree
       break;
   }
 }
@@ -108,5 +112,9 @@ void loop() {
   incomingByte = Serial.parseInt();
 
   turnServo(incomingByte);
+  delay(400);
   runMotor(incomingByte);
+  delay(400);
+  Serial.write("done"); // send "done" response to the app
+  Serial.flush(); // flush serial
 }
