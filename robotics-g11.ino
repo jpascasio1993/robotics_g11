@@ -112,5 +112,9 @@ void loop() {
   incomingByte = Serial.parseInt();
 
   turnServo(incomingByte);
+  delay(400);
   runMotor(incomingByte);
+  delay(400);
+  Serial.write("done"); // send "done" response to the app
+  Serial.flush(); // flush serial
 }
