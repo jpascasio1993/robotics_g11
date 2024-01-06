@@ -14,6 +14,7 @@ const int servoMaxPWM=2400; // 2400 is equals to 180 degree;
 const int servoMidPWM=1200; // 1200 is equals to 90 degree;
 
 const int serialBaudRate=9600;
+const int maxPWM = 255;
 
 const int JOYSTICK_LEFT=1;
 const int JOYSTICK_RIGHT=2;
@@ -89,11 +90,11 @@ void turnServo(int joystickDirection){
 void turnDirection(int turnJoystickDirection, int speed) {
    switch(joystickDirection) {
     case JOYSTICK_LEFT:
-      accelerateLeft(0);
+      accelerateLeft(maxPWM - speed);
       accelerateRight(speed);
       break;
     case JOYSTICK_RIGHT:
-      accelerateRight(0);
+      accelerateRight(maxPWM - speed);
       accelerateLeft(speed);
       break;
   }
