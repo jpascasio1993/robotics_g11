@@ -154,9 +154,11 @@ void loop() {
   int pwm = setMotorSpeed((incomingByte.toInt() % 1000));
   // turnServo(incomingByte.toInt());
   delay(400);
-  runMotor(incomingByte.toInt());
+  runMotor(commandCode);
   delay(400);
-  Serial.println(incomingByte.toInt());
+  turnDirection(commandCode, pwm);
+  delay(400);
+  Serial.println(commandCode);
   Serial.write("done"); // send "done" response to the app
   Serial.flush(); // flush serial
 }
