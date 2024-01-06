@@ -15,72 +15,110 @@ const int servoMidPWM=1200; // 1200 is equals to 90 degree;
 
 const int serialBaudRate=9600;
 
-const String JOYSTICK_LEFT="1";
-const String JOYSTICK_RIGHT="2";
+const int JOYSTICK_LEFT=1;
+const int JOYSTICK_RIGHT=2;
 
-const String BUTTON_A_FORWARD="50";
-const String BUTTON_B_BACKWARD="51";
-const String STOP="52";
+const int BUTTON_A_FORWARD=50;
+const int BUTTON_B_BACKWARD=51;
+const int STOP=52;
 
-int motorSpeed=0;
+String incomingByte; // data received from mobile app transmitted through bluetooth
 
-
-String incomingByte = ""; // data received from mobile app transmitted through bluetooth
+int motorSpeedLeft = 0;
+int motorSpeedRight = 0;
 
 int servoDegree=0;
 
 Servo servo;
 
+int setMotorSpeed(int speed) {
+  return constrain(speed, 0, 255);
+}
+
 void turnOffLeftMotor() {
+  motorSpeedLeft = setMotorSpeed(0);
   digitalWrite(motorPinIn1, LOW);
   digitalWrite(motorPinIn2, LOW);
+  analogWrite(motorPinEnA, motorSpeedLeft);
 }
 
 void turnOffRightMotor() {
+  motorSpeedRight = setMotorSpeed(0);
   digitalWrite(motorPinIn3, LOW);
   digitalWrite(motorPinIn4, LOW);
+  analogWrite(motorPinEnB, motorSpeedRight);
 }
 
 void turnOnLeftMotor(bool isReverse) {
   digitalWrite(motorPinIn1, isReverse ? LOW : HIGH);
   digitalWrite(motorPinIn2, isReverse ? HIGH : LOW);
+  // analogWrite(motorPinEnA, 255);
 }
 
 void turnOnRightMotor(bool isReverse) {
   digitalWrite(motorPinIn3, isReverse ? LOW : HIGH);
   digitalWrite(motorPinIn4, isReverse ? HIGH : LOW);
+  // analogWrite(motorPinEnB, 255);
 }
 
-void turnServo(String joystickDirection){
-  if(JOYSTICK_LEFT == joystickDirection) {
+void accelerateMotor(int motorPin, int speed) {
+  analogWrite(motorPin, setMotorSpeed(speed));
+}
+
+void accelerateLeft(int speed) {
+  accelerateMotor(motorPinEnA, speed);
+}
+
+void accelerateRight(int speed) {
+  accelerateMotor(motorPinEnB, speed);
+}
+
+void turnServo(int joystickDirection){
+  switch(joystickDirection) {
+    case JOYSTICK_LEFT:
       servoDegree = 10;
       servo.write(servoDegree); // turn servo motor to angle 10 degree
-      return;
-  }
-
-  if(JOYSTICK_RIGHT == joystickDirection) {
-    servoDegree=160;
-    servo.write(servoDegree); // turn servo motor to angle 160 degree
-    return;
+      break;
+    case JOYSTICK_RIGHT:
+      servoDegree=160;
+      servo.write(servoDegree); // turn servo motor to angle 160 degree
+      break;
   }
 }
 
-void runMotor(String joystickDirection) {
-
-  if(BUTTON_A_FORWARD == joystickDirection) {
-      turnOnLeftMotor(false); // run motor forward
-      turnOnRightMotor(false); // run motor forward
-      return;
+void turnDirection(int turnJoystickDirection, int speed) {
+   switch(joystickDirection) {
+    case JOYSTICK_LEFT:
+      accelerateLeft(0);
+      accelerateRight(speed);
+      break;
+    case JOYSTICK_RIGHT:
+      accelerateRight(0);
+      accelerateLeft(speed);
+      break;
   }
+}
 
-  if(BUTTON_B_BACKWARD == joystickDirection) {
-    turnOnLeftMotor(true); // run motor direction
-    turnOnRightMotor(true); // run motor direction
-    return;
+void runMotor(int joystickDirection) {
+  switch(joystickDirection) {
+    case BUTTON_A_FORWARD:
+        turnOnLeftMotor(false); // run motor forward
+        turnOnRightMotor(false); // run motor forward
+      break;
+
+    case BUTTON_B_BACKWARD:
+        turnOnLeftMotor(true); // run motor direction
+        turnOnRightMotor(true); // run motor direction
+      break;
+
+    case STOP:
+        turnOffLeftMotor();
+        turnOffRightMotor();
+      break;
+
+    default:
+      break;
   }
-
-  turnOffLeftMotor();
-  turnOffRightMotor();
 }
 
 void setup() {
@@ -112,11 +150,13 @@ void loop() {
   if(!(Serial.available() > 0)) return;
 
   incomingByte = Serial.readString();
-
-  turnServo(incomingByte);
+  int commandCode = (int)(incomingByte.toInt() / 1000);
+  int pwm = setMotorSpeed((incomingByte.toInt() % 1000));
+  // turnServo(incomingByte.toInt());
   delay(400);
-  runMotor(incomingByte);
+  runMotor(incomingByte.toInt());
   delay(400);
+  Serial.println(incomingByte.toInt());
   Serial.write("done"); // send "done" response to the app
   Serial.flush(); // flush serial
 }
