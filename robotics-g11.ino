@@ -15,15 +15,17 @@ const int servoMidPWM=1200; // 1200 is equals to 90 degree;
 
 const int serialBaudRate=9600;
 
-const int JOYSTICK_LEFT=1;
-const int JOYSTICK_RIGHT=2;
+const String JOYSTICK_LEFT="1";
+const String JOYSTICK_RIGHT="2";
 
-const int BUTTON_A_FORWARD=50;
-const int BUTTON_B_BACKWARD=51;
-const int STOP=52;
+const String BUTTON_A_FORWARD="50";
+const String BUTTON_B_BACKWARD="51";
+const String STOP="52";
+
+int motorSpeed=0;
 
 
-int incomingByte; // data received from mobile app transmitted through bluetooth
+String incomingByte = ""; // data received from mobile app transmitted through bluetooth
 
 int servoDegree=0;
 
@@ -49,36 +51,36 @@ void turnOnRightMotor(bool isReverse) {
   digitalWrite(motorPinIn4, isReverse ? HIGH : LOW);
 }
 
-void turnServo(int joystickDirection){
-  switch(joystickDirection) {
-    case JOYSTICK_LEFT:
+void turnServo(String joystickDirection){
+  if(JOYSTICK_LEFT == joystickDirection) {
       servoDegree = 10;
       servo.write(servoDegree); // turn servo motor to angle 10 degree
-      break;
-    case JOYSTICK_RIGHT:
-      servoDegree=160;
-      servo.write(servoDegree); // turn servo motor to angle 160 degree
-      break;
+      return;
+  }
+
+  if(JOYSTICK_RIGHT == joystickDirection) {
+    servoDegree=160;
+    servo.write(servoDegree); // turn servo motor to angle 160 degree
+    return;
   }
 }
 
-void runMotor(int joystickDirection) {
-  switch(joystickDirection) {
-    case BUTTON_A_FORWARD:
-        turnOnLeftMotor(false); // run motor forward
-        turnOnRightMotor(false); // run motor forward
-      break;
+void runMotor(String joystickDirection) {
 
-    case BUTTON_B_BACKWARD:
-        turnOnLeftMotor(true); // run motor direction
-        turnOnRightMotor(true); // run motor direction
-      break;
-
-    default:
-        turnOffLeftMotor();
-        turnOffRightMotor();
-      break;
+  if(BUTTON_A_FORWARD == joystickDirection) {
+      turnOnLeftMotor(false); // run motor forward
+      turnOnRightMotor(false); // run motor forward
+      return;
   }
+
+  if(BUTTON_B_BACKWARD == joystickDirection) {
+    turnOnLeftMotor(true); // run motor direction
+    turnOnRightMotor(true); // run motor direction
+    return;
+  }
+
+  turnOffLeftMotor();
+  turnOffRightMotor();
 }
 
 void setup() {
@@ -109,7 +111,7 @@ void loop() {
   // if no data received from bluetooth, skip process
   if(!(Serial.available() > 0)) return;
 
-  incomingByte = Serial.parseInt();
+  incomingByte = Serial.readString();
 
   turnServo(incomingByte);
   delay(400);
