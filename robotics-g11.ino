@@ -127,8 +127,8 @@ void loop() {
   // if no data received from bluetooth, skip process
   if(!(Serial.available() > 0)) return; 
   incomingByte = Serial.readString();
-  int incomingByteToInt = incomingByte.toInt();
-  int YaxisCommand = (int)(incomingByteToInt / 1000);
+  long incomingByteToInt = incomingByte.toInt();
+  int YaxisCommand = (int)(incomingByteToInt / 10000);
   int temp = incomingByteToInt - (YaxisCommand * 10000);
   int pwm = setMotorSpeed((int)((temp) / 10));
   int XaxisCommand = (int)(temp - (pwm * 10));
