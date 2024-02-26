@@ -67,11 +67,11 @@ void accelerateRight(int speed) {
 void turnDirection(int turnJoystickDirection, int speed) {
    switch(turnJoystickDirection) {
     case JOYSTICK_LEFT:
-      accelerateLeft(maxPWM - speed);
+      accelerateLeft(0);
       accelerateRight(speed);
       break;
     case JOYSTICK_RIGHT:
-      accelerateRight(maxPWM - speed);
+      accelerateRight(0);
       accelerateLeft(speed);
       break;
     default:
@@ -127,12 +127,15 @@ void loop() {
   // if no data received from bluetooth, skip process
   if(!(Serial.available() > 0)) return; 
   incomingByte = Serial.readString();
-  int commandCode = (int)(incomingByte.toInt() / 1000);
-  int pwm = setMotorSpeed((incomingByte.toInt() % 1000));
+  int incomingByteToInt = incomingByte.toInt();
+  int YaxisCommand = (int)(incomingByteToInt / 1000);
+  int temp = incomingByteToInt - (YaxisCommand * 10000);
+  int pwm = setMotorSpeed((int)((temp) / 10));
+  int XaxisCommand = (int)(temp - (pwm * 10));
   delay(100);
-  runMotor(commandCode);
+  runMotor(YaxisCommand);
   delay(100);
-  turnDirection(commandCode, pwm);
+  turnDirection(XaxisCommand, pwm);
   delay(100);
   Serial.write("done");
   Serial.flush(); // flush serial
